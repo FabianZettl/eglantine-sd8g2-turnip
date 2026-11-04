@@ -27,6 +27,14 @@ on:
         description: none or both
         type: string
         default: none
+      arch:
+        description: both, x86_64 or aarch64
+        type: string
+        default: both
+      preset:
+        description: Value for -DYUZU_BUILD_PRESET (empty keeps the project default)
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -49,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, aarch64]
+        arch: ${{ fromJSON(inputs.arch == 'both' && '["x86_64","aarch64"]' || format('["{0}"]', inputs.arch)) }}
         pgo: ${{ fromJSON(inputs.pgo == 'both' && '[false, true]' || '[false]') }}
 
     steps:
@@ -176,6 +184,9 @@ jobs:
               "-DCMAKE_C_FLAGS=$profile"
               "-DCMAKE_CXX_FLAGS=$profile"
             )
+          fi
+          if [ -n '${{ inputs.preset }}' ]; then
+            flags+=("-DYUZU_BUILD_PRESET=${{ inputs.preset }}")
           fi
           cmake -S . -B build/release -G Ninja "${flags[@]}"
 

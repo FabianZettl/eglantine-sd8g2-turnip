@@ -363,7 +363,7 @@ if (CXX_GCC OR CXX_CLANG)
         endif()
     elseif(ARCHITECTURE_arm64)
         # See https://gcc.gnu.org/onlinedocs/gcc/AArch64-Options.html
-        set(YUZU_BUILD_PRESET "custom" CACHE STRING "Build preset to use. One of: custom, generic, optimized, armv9, native")
+        set(YUZU_BUILD_PRESET "custom" CACHE STRING "Build preset to use. One of: custom, generic, optimized, armv9, thor, native")
         set(mtune generic)
         if (${YUZU_BUILD_PRESET} STREQUAL "generic")
             set(march armv8-a)
@@ -371,6 +371,12 @@ if (CXX_GCC OR CXX_CLANG)
             set(march armv8.2-a+lse+rcpc)
         elseif (${YUZU_BUILD_PRESET} STREQUAL "armv9")
             set(march armv9-a)
+        elseif (${YUZU_BUILD_PRESET} STREQUAL "thor")
+            # AYN Thor Pro (Snapdragon 8 Gen 2: Cortex-X3, 2x A715, 2x A710, 3x A510). Read from the device: all eight cores report
+            # the same ISA (LSE, dotprod, fp16 and fp16fml, lrcpc2, i8mm, crypto), and none has SVE or BF16, so not armv8.6 or armv9.
+            # Scheduling is tuned for the X3, which runs the heavy threads. Runs on that SoC only.
+            set(march armv8.4-a+i8mm)
+            set(mtune cortex-x3)
         endif()
     endif()
 

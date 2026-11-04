@@ -1,0 +1,32 @@
+name: thor-build
+
+# Builds Eglantine for the AYN Thor Pro only (aarch64 on GitHub's ARM runners) with the "thor" CPU preset.
+# Start it from the Actions tab. pgo=both builds the plain and the PGO variant side by side to compare them.
+on:
+  workflow_dispatch:
+    inputs:
+      pgo:
+        description: none or both
+        type: string
+        default: both
+      preset:
+        description: YUZU_BUILD_PRESET (thor, optimized, armv9, ...)
+        type: string
+        default: thor
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-linux.yml
+    with:
+      sha: ${{ github.sha }}
+      version: thor-${{ inputs.preset }}-${{ github.run_number }}
+      refspec: thor-${{ inputs.preset }}-${{ github.run_number }}
+      tag: thor-${{ github.run_number }}
+      release: false
+      nightly: false
+      pgo: ${{ inputs.pgo }}
+      arch: aarch64
+      preset: ${{ inputs.preset }}
