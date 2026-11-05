@@ -4700,6 +4700,9 @@ void MainWindow::UpdateStatusBar() {
         fpsText = fpsText % QStringLiteral(" (%1)").arg(m_fpsSuffix);
 
     game_fps_label->setText(fpsText);
+    // Thor fork: one machine-readable line per update, read by the benchmark script (no screen needed)
+    LOG_INFO(Frontend, "perf: fps={:.1f} speed={:.0f} frame_ms={:.2f}", results.average_game_fps,
+             results.emulation_speed * 100.0, results.frametime * 1000.0);
 
     emu_frametime_label->setText(tr("Frame: %1 ms").arg(results.frametime * 1000.0, 0, 'f', 2));
 
